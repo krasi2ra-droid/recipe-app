@@ -6,7 +6,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-mongoose.connect("mongodb+srv://Brooke:preslikrisi99@cluster0.cb3cklz.mongodb.net/recipes");
+mongoose.connect("mongodb://Brooke:preslikrisi99@ac-dksmkfx-shard-00-00.opyc2e6.mongodb.net:27017,ac-dksmkfx-shard-00-01.opyc2e6.mongodb.net:27017,ac-dksmkfx-shard-00-02.opyc2e6.mongodb.net:27017/recipes?ssl=true&replicaSet=atlas-d0l1p4-shard-0&authSource=admin&retryWrites=true&w=majority")
+.then(() => console.log("✅ MongoDB connected"))
+.catch(err => console.error("❌ Mongo error:", err));
 
 const Recipe = mongoose.model('Recipe', {
   title: String,
