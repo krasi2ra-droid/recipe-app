@@ -1,78 +1,65 @@
 <!DOCTYPE html>
 <html lang="bg">
 <head>
-  <meta charset="UTF-8">
-  <title>🍲 Recipe App</title>
+<meta charset="UTF-8">
+<title>🍲 Recipe App</title>
 
-  <style>
-    body {
-      font-family: Arial;
-      background: #f4f6f9;
-      padding: 20px;
-    }
+<style>
+body {
+  font-family: Arial;
+  background: #f4f6f9;
+  padding: 20px;
+}
 
-    .container {
-      max-width: 600px;
-      margin: auto;
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
+.container {
+  max-width: 700px;
+  margin: auto;
+}
 
-    input {
-      width: 45%;
-      padding: 10px;
-      margin: 5px;
-    }
+.card {
+  background: white;
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
 
-    button {
-      padding: 8px 12px;
-      margin: 5px;
-      cursor: pointer;
-      border: none;
-      border-radius: 5px;
-    }
+input {
+  width: 45%;
+  padding: 10px;
+  margin: 5px;
+}
 
-    .add {
-      background: green;
-      color: white;
-    }
+button {
+  padding: 8px 12px;
+  margin: 5px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
 
-    .delete {
-      background: red;
-      color: white;
-    }
-
-    ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    li {
-      background: #eee;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 8px;
-    }
-  </style>
+.add { background: green; color: white; }
+.delete { background: red; color: white; }
+.edit { background: orange; color: white; }
+</style>
 </head>
 
 <body>
 
 <div class="container">
-  <h1>🍲 Recipe App</h1>
+<h1>🍲 Recipe App</h1>
 
-  <input id="title" placeholder="Заглавие">
-  <input id="content" placeholder="Описание">
-  <button class="add" onclick="addRecipe()">Добави</button>
+<input id="title" placeholder="Заглавие">
+<input id="content" placeholder="Описание">
+<input id="image" placeholder="Снимка URL">
+<button class="add" onclick="addOrUpdate()">Добави</button>
 
-  <h2>Рецепти</h2>
-  <ul id="list"></ul>
+<div id="list"></div>
 </div>
 
 <script>
 const API = "https://recipe-app-3jmt.onrender.com";
+let editId = null;
 
 async function loadRecipes() {
   const res = await fetch(API + "/recipes");
@@ -82,39 +69,55 @@ async function loadRecipes() {
   list.innerHTML = "";
 
   data.forEach(r => {
-    const li = document.createElement("li");
+    const div = document.createElement("div");
+    div.className = "card";
 
-    li.innerHTML = `
-      <b>${r.title}</b><br>
-      ${r.content}
+    div.innerHTML = `
+      <h3>${r.title}</h3>
+      <p>${r.content}</p>
+      ${r.image ? `<img src="${r.image}" width="100%">` : ""}
       <br>
-      <button class="delete" onclick="deleteRecipe('${r._id}')">Изтрий</button>
+      <button class="edit" onclick="editRecipe('${r._id}','${r.title}','${r.content}','${r.image || ""}')">✏️</button>
+      <button class="delete" onclick="deleteRecipe('${r._id}')">❌</button>
     `;
 
-    list.appendChild(li);
+    list.appendChild(div);
   });
 }
 
-async function addRecipe() {
+function editRecipe(id, title, content, image) {
+  document.getElementById("title").value = title;
+  document.getElementById("content").value = content;
+  document.getElementById("image").value = image;
+
+  editId = id;
+}
+
+async function addOrUpdate() {
   const title = document.getElementById("title").value;
   const content = document.getElementById("content").value;
+  const image = document.getElementById("image").value;
 
-  await fetch(API + "/recipes", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ title, content })
-  });
+  if (editId) {
+    await fetch(API + "/recipes/" + editId, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title, content, image })
+    });
+    editId = null;
+  } else {
+    await fetch(API + "/recipes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title, content, image })
+    });
+  }
 
   loadRecipes();
 }
 
 async function deleteRecipe(id) {
-  await fetch(API + "/recipes/" + id, {
-    method: "DELETE"
-  });
-
+  await fetch(API + "/recipes/" + id, { method: "DELETE" });
   loadRecipes();
 }
 
