@@ -28,6 +28,15 @@ app.post('/recipes', async (req, res) => {
   res.json(recipe);
 });
 
+app.put('/recipes/:id', async (req, res) => {
+  const updated = await Recipe.findByIdAndUpdate(
+    req.params.id,
+    req.body,
+    { new: true }
+  );
+  res.json(updated);
+});
+
 app.delete('/recipes/:id', async (req, res) => {
   await Recipe.findByIdAndDelete(req.params.id);
   res.send('Deleted');
