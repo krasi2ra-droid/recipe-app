@@ -1,19 +1,75 @@
 <!DOCTYPE html>
-<html>
+<html lang="bg">
 <head>
   <meta charset="UTF-8">
-  <title>Recipe App</title>
+  <title>🍲 Recipe App</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #f4f6f9;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    input {
+      width: 45%;
+      padding: 10px;
+      margin: 5px;
+    }
+
+    button {
+      padding: 8px 12px;
+      margin: 5px;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+    }
+
+    .add {
+      background: green;
+      color: white;
+    }
+
+    .delete {
+      background: red;
+      color: white;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      background: #eee;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+    }
+  </style>
 </head>
+
 <body>
 
-<h1>🍲 Recipe App</h1>
+<div class="container">
+  <h1>🍲 Recipe App</h1>
 
-<input id="title" placeholder="Заглавие">
-<input id="content" placeholder="Описание">
-<button onclick="addRecipe()">Добави</button>
+  <input id="title" placeholder="Заглавие">
+  <input id="content" placeholder="Описание">
+  <button class="add" onclick="addRecipe()">Добави</button>
 
-<h2>Рецепти:</h2>
-<ul id="list"></ul>
+  <h2>Рецепти</h2>
+  <ul id="list"></ul>
+</div>
 
 <script>
 const API = "https://recipe-app-3jmt.onrender.com";
@@ -27,8 +83,14 @@ async function loadRecipes() {
 
   data.forEach(r => {
     const li = document.createElement("li");
-    li.innerHTML = r.title + " - " + r.content +
-      ` <button onclick="deleteRecipe('${r._id}')">❌</button>`;
+
+    li.innerHTML = `
+      <b>${r.title}</b><br>
+      ${r.content}
+      <br>
+      <button class="delete" onclick="deleteRecipe('${r._id}')">Изтрий</button>
+    `;
+
     list.appendChild(li);
   });
 }
@@ -39,7 +101,9 @@ async function addRecipe() {
 
   await fetch(API + "/recipes", {
     method: "POST",
-    headers: {"Content-Type": "application/json"},
+    headers: {
+      "Content-Type": "application/json"
+    },
     body: JSON.stringify({ title, content })
   });
 
