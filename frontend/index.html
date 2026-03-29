@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Recipe App</title>
+</head>
+<body>
+
+<h1>🍲 Recipe App</h1>
+
+<input id="title" placeholder="Заглавие">
+<input id="content" placeholder="Описание">
+<button onclick="addRecipe()">Добави</button>
+
+<h2>Рецепти:</h2>
+<ul id="list"></ul>
+
+<script>
+const API = "https://recipe-app-3jmt.onrender.com";
+
+async function loadRecipes() {
+  const res = await fetch(API + "/recipes");
+  const data = await res.json();
+
+  const list = document.getElementById("list");
+  list.innerHTML = "";
+
+  data.forEach(r => {
+    const li = document.createElement("li");
+    li.innerHTML = r.title + " - " + r.content +
+      ` <button onclick="deleteRecipe('${r._id}')">❌</button>`;
+    list.appendChild(li);
+  });
+}
+
+async function addRecipe() {
+  const title = document.getElementById("title").value;
+  const content = document.getElementById("content").value;
+
+  await fetch(API + "/recipes", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ title, content })
+  });
+
+  loadRecipes();
+}
+
+async function deleteRecipe(id) {
+  await fetch(API + "/recipes/" + id, {
+    method: "DELETE"
+  });
+
+  loadRecipes();
+}
+
+loadRecipes();
+</script>
+
+</body>
+</html>
