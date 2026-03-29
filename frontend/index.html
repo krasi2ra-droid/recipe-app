@@ -167,9 +167,9 @@ async function addOrUpdate() {
   }
 
   // 🧹 clear fields
-  title.value = "";
-  content.value = "";
-  image.value = "";
+  document.getElementById("title").value = "";
+document.getElementById("content").value = "";
+document.getElementById("image").value = "";
 
   loadRecipes();
 }
