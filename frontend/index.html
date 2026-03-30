@@ -149,10 +149,12 @@ async function loadRecipes() {
   const search = document.getElementById("search").value.toLowerCase();
   const category = getCategoryFromURL();
 
+  const normalize = str => (str || "").trim().toLowerCase();
+
   data = data.filter(r =>
-    r.title.toLowerCase().includes(search) &&
-    (category === "" || r.category === category)
-  );
+  r.title.toLowerCase().includes(search) &&
+  (category === "" || (r.category || "").trim().toLowerCase() === category.trim().toLowerCase())
+);
 
   const list = document.getElementById("list");
   list.innerHTML = "";
