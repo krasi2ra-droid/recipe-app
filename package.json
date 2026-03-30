@@ -7,10 +7,22 @@
   },
   "dependencies": {
     "cors": "^2.8.6",
-    "express": "^4.18.2",
+    "express": "^4.22.1",
     "mongoose": "^9.3.3"
   },
   "engines": {
     "node": ">=18"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/krasi2ra-droid/recipe-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/krasi2ra-droid/recipe-app/issues"
+  },
+  "homepage": "https://github.com/krasi2ra-droid/recipe-app#readme",
+  "description": ""
 }
