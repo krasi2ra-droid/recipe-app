@@ -21,41 +21,17 @@ h1 {
   text-align: center;
 }
 
-/* NAV */
 .nav {
   text-align: center;
-  margin: 20px 0;
+  margin-bottom: 20px;
 }
 
 .nav a {
+  margin: 0 10px;
   text-decoration: none;
-  background: #007bff;
-  color: white;
-  padding: 8px 12px;
-  margin: 5px;
-  border-radius: 6px;
-  display: inline-block;
+  font-weight: bold;
 }
 
-/* ADD */
-.add-box input, select {
-  padding: 10px;
-  margin: 5px;
-  width: 23%;
-}
-
-button {
-  padding: 8px 12px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.add { background: #28a745; color: white; }
-.edit { background: orange; color: white; }
-.delete { background: red; color: white; }
-
-/* CARD */
 .card {
   background: white;
   padding: 15px;
@@ -70,7 +46,6 @@ button {
   margin-top: 10px;
 }
 
-/* CATEGORY */
 .category {
   font-size: 18px;
   font-weight: bold;
@@ -85,7 +60,6 @@ button {
 
 <h1>🍲 Recipe App</h1>
 
-<!-- NAVIGATION -->
 <div class="nav">
   <a href="/">Всички</a>
   <a href="/supi">Супи</a>
@@ -96,141 +70,23 @@ button {
   <a href="/salati">Салати</a>
 </div>
 
-<!-- ADD -->
-<div class="add-box">
+<div>
   <input id="title" placeholder="Заглавие">
   <input id="content" placeholder="Описание">
   <input id="image" placeholder="Снимка URL">
-
-  <select id="category">
-    <option>Супи</option>
-    <option>Предястия</option>
-    <option>Основни</option>
-    <option>Десерти</option>
-    <option>Тестени</option>
-    <option>Салати</option>
-  </select>
-
-  <button class="add" onclick="addOrUpdate()">Добави</button>
+  <input id="category" placeholder="Категория">
+  <button onclick="addOrUpdate()">Добави</button>
 </div>
 
-<!-- SEARCH -->
+<br>
+
 <input id="search" placeholder="🔍 Търси..." oninput="loadRecipes()">
 
-<!-- LIST -->
 <div id="list"></div>
 
 </div>
 
-<script>
-
-const API = "https://recipe-app-3jmt.onrender.com";
-let editId = null;
-
-/* ROUTER */
-function getCategoryFromURL() {
-  const path = window.location.pathname;
-
-  if (path.includes("supi")) return "Супи";
-  if (path.includes("predqstiq")) return "Предястия";
-  if (path.includes("osnovni")) return "Основни";
-  if (path.includes("deserti")) return "Десерти";
-  if (path.includes("testeni")) return "Тестени";
-  if (path.includes("salati")) return "Салати";
-
-  return "";
-}
-
-/* LOAD */
-async function loadRecipes() {
-  const res = await fetch(API + "/recipes");
-  let data = await res.json();
-
-  const search = document.getElementById("search").value.toLowerCase();
-  const category = getCategoryFromURL();
-  
-  console.log("CATEGORY:", category);
-
-  const normalize = str => (str || "").trim().toLowerCase();
-
-data = data.filter(r =>
-  r.title.toLowerCase().includes(search) &&
-  (category === "" || normalize(r.category) === normalize(category))
-);
-
-  const list = document.getElementById("list");
-  list.innerHTML = "";
-
-  data.forEach(r => {
-    console.log("RECIPE CATEGORY:", r.category);
-    const div = document.createElement("div");
-    div.className = "card";
-
-    div.innerHTML = `
-      <h3>${r.title}</h3>
-      <div class="category">${r.category}</div>
-      <p>${r.content}</p>
-      ${r.image ? `<img src="${r.image}">` : ""}
-
-      <br>
-      <button class="edit" onclick="editRecipe('${r._id}','${r.title}','${r.content}','${r.image || ""}','${r.category}')">✏️</button>
-      <button class="delete" onclick="deleteRecipe('${r._id}')">❌</button>
-    `;
-
-    list.appendChild(div);
-  });
-}
-
-/* ADD / UPDATE */
-async function addOrUpdate() {
-  const title = document.getElementById("title").value;
-  const content = document.getElementById("content").value;
-  const image = document.getElementById("image").value;
-  const category = document.getElementById("category").value;
-
-  if (!title || !content) return alert("Попълни полетата!");
-
-  if (editId) {
-    await fetch(API + "/recipes/" + editId, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, content, image, category })
-    });
-    editId = null;
-  } else {
-    await fetch(API + "/recipes", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, content, image, category })
-    });
-  }
-
-  document.getElementById("title").value = "";
-  document.getElementById("content").value = "";
-  document.getElementById("image").value = "";
-
-  loadRecipes();
-}
-
-/* EDIT */
-function editRecipe(id, title, content, image, category) {
-  document.getElementById("title").value = title;
-  document.getElementById("content").value = content;
-  document.getElementById("image").value = image;
-  document.getElementById("category").value = category;
-
-  editId = id;
-}
-
-/* DELETE */
-async function deleteRecipe(id) {
-  await fetch(API + "/recipes/" + id, { method: "DELETE" });
-  loadRecipes();
-}
-
-loadRecipes();
-
-</script>
+<script src="app.js"></script>
 
 </body>
 </html>
