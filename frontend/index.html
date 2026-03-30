@@ -151,9 +151,9 @@ async function loadRecipes() {
 
   const normalize = str => (str || "").trim().toLowerCase();
 
-  data = data.filter(r =>
+data = data.filter(r =>
   r.title.toLowerCase().includes(search) &&
-  (category === "" || (r.category || "").trim().toLowerCase() === category.trim().toLowerCase())
+  (category === "" || normalize(r.category) === normalize(category))
 );
 
   const list = document.getElementById("list");
