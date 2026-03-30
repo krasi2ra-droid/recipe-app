@@ -9,44 +9,57 @@ body {
   font-family: Arial;
   background: #eef2f7;
   margin: 0;
-  padding: 20px;
 }
 
 .container {
   max-width: 900px;
   margin: auto;
+  padding: 20px;
 }
 
 h1 {
   text-align: center;
 }
 
-.controls input, .controls select {
-  padding: 10px;
-  margin: 5px;
-  width: 30%;
+/* NAV */
+.nav {
+  text-align: center;
+  margin: 20px 0;
 }
 
-.add-box input {
+.nav a {
+  text-decoration: none;
+  background: #007bff;
+  color: white;
+  padding: 8px 12px;
+  margin: 5px;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+/* ADD */
+.add-box input, select {
+  padding: 10px;
+  margin: 5px;
   width: 23%;
 }
 
 button {
   padding: 8px 12px;
-  margin: 5px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
 }
 
 .add { background: #28a745; color: white; }
-.edit { background: #ff9800; color: white; }
-.delete { background: #dc3545; color: white; }
+.edit { background: orange; color: white; }
+.delete { background: red; color: white; }
 
+/* CARD */
 .card {
   background: white;
   padding: 15px;
-  margin: 10px 0;
+  margin: 15px 0;
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
@@ -56,12 +69,12 @@ button {
   border-radius: 8px;
   margin-top: 10px;
 }
+
+/* CATEGORY */
 .category {
-  font-size: 18px;   /* 👈 това прави текста по-голям */
-  font-weight: bold; /* 👈 удебелен */
-  color: #444;
-  margin-top: 5px;
-  margin-bottom: 5px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #555;
 }
 </style>
 </head>
@@ -72,11 +85,22 @@ button {
 
 <h1>🍲 Recipe App</h1>
 
+<!-- NAVIGATION -->
+<div class="nav">
+  <a href="/">Всички</a>
+  <a href="/supi">Супи</a>
+  <a href="/predqstiq">Предястия</a>
+  <a href="/osnovni">Основни</a>
+  <a href="/deserti">Десерти</a>
+  <a href="/testeni">Тестени</a>
+  <a href="/salati">Салати</a>
+</div>
+
 <!-- ADD -->
 <div class="add-box">
   <input id="title" placeholder="Заглавие">
   <input id="content" placeholder="Описание">
-  <input id="image" placeholder="Снимка (URL)">
+  <input id="image" placeholder="Снимка URL">
 
   <select id="category">
     <option>Супи</option>
@@ -90,20 +114,8 @@ button {
   <button class="add" onclick="addOrUpdate()">Добави</button>
 </div>
 
-<!-- SEARCH + FILTER -->
-<div class="controls">
-  <input id="search" placeholder="🔍 Търси..." oninput="loadRecipes()">
-
-  <select id="filter" onchange="loadRecipes()">
-    <option value="">Всички</option>
-    <option>Супи</option>
-    <option>Предястия</option>
-    <option>Основни</option>
-    <option>Десерти</option>
-    <option>Тестени</option>
-    <option>Салати</option>
-  </select>
-</div>
+<!-- SEARCH -->
+<input id="search" placeholder="🔍 Търси..." oninput="loadRecipes()">
 
 <!-- LIST -->
 <div id="list"></div>
@@ -113,20 +125,33 @@ button {
 <script>
 
 const API = "https://recipe-app-3jmt.onrender.com";
-
 let editId = null;
 
-// 📥 LOAD
+/* ROUTER */
+function getCategoryFromURL() {
+  const path = window.location.pathname;
+
+  if (path.includes("supi")) return "Супи";
+  if (path.includes("predqstiq")) return "Предястия";
+  if (path.includes("osnovni")) return "Основни";
+  if (path.includes("deserti")) return "Десерти";
+  if (path.includes("testeni")) return "Тестени";
+  if (path.includes("salati")) return "Салати";
+
+  return "";
+}
+
+/* LOAD */
 async function loadRecipes() {
   const res = await fetch(API + "/recipes");
   let data = await res.json();
 
   const search = document.getElementById("search").value.toLowerCase();
-  const filter = document.getElementById("filter").value;
+  const category = getCategoryFromURL();
 
   data = data.filter(r =>
     r.title.toLowerCase().includes(search) &&
-    (filter === "" || r.category === filter)
+    (category === "" || r.category === category)
   );
 
   const list = document.getElementById("list");
@@ -138,12 +163,12 @@ async function loadRecipes() {
 
     div.innerHTML = `
       <h3>${r.title}</h3>
-      <div class="category">${r.category || ""}</div>
+      <div class="category">${r.category}</div>
       <p>${r.content}</p>
       ${r.image ? `<img src="${r.image}">` : ""}
 
       <br>
-      <button class="edit" onclick="editRecipe('${r._id}','${r.title}','${r.content}','${r.image || ""}','${r.category || ""}')">✏️</button>
+      <button class="edit" onclick="editRecipe('${r._id}','${r.title}','${r.content}','${r.image || ""}','${r.category}')">✏️</button>
       <button class="delete" onclick="deleteRecipe('${r._id}')">❌</button>
     `;
 
@@ -151,7 +176,7 @@ async function loadRecipes() {
   });
 }
 
-// ➕ ADD / UPDATE
+/* ADD / UPDATE */
 async function addOrUpdate() {
   const title = document.getElementById("title").value;
   const content = document.getElementById("content").value;
@@ -175,15 +200,14 @@ async function addOrUpdate() {
     });
   }
 
-  // 🧹 clear fields
   document.getElementById("title").value = "";
-document.getElementById("content").value = "";
-document.getElementById("image").value = "";
+  document.getElementById("content").value = "";
+  document.getElementById("image").value = "";
 
   loadRecipes();
 }
 
-// ✏️ EDIT
+/* EDIT */
 function editRecipe(id, title, content, image, category) {
   document.getElementById("title").value = title;
   document.getElementById("content").value = content;
@@ -193,12 +217,9 @@ function editRecipe(id, title, content, image, category) {
   editId = id;
 }
 
-// ❌ DELETE
+/* DELETE */
 async function deleteRecipe(id) {
-  await fetch(API + "/recipes/" + id, {
-    method: "DELETE"
-  });
-
+  await fetch(API + "/recipes/" + id, { method: "DELETE" });
   loadRecipes();
 }
 
