@@ -1,0 +1,32 @@
+.container {
+  max-width: 900px;
+  margin: auto;
+}
+
+input, button {
+  margin: 5px;
+  padding: 8px;
+}
+
+.card {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin: 10px;
+}
+
+.card img {
+  width: 100%;
+}
+
+.nav {
+  text-align: center;
+  margin: 10px;
+}
+
+.nav a {
+  margin: 5px;
+  padding: 8px;
+  background: #ddd;
+  border-radius: 5px;
+  text-decoration: none;
+}
